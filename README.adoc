@@ -1,0 +1,46 @@
+= HAR Mock Generator
+
+[abstract]
+This extension aims at making frontend developers and backend developers communicating more accurately and in an up-to-date fashion on the contract they are linked by.
+
+== JAX-RS (client) setup
+
+This JAX-RS extension enables to add a feature to a client capturing requests/responses in a HAR format:
+
+[source,java]
+----
+// init
+final HarClientFeature feature = new HarClientFeature();
+final Client client = ClientBuilder.newClient();
+client.register(feature);
+
+//
+// do run tests, any code using the client
+//
+
+// get the har as string
+final String har = new HarWriter().toString(feature.getHar())
+
+// or directly dump the har:
+new HarWriter()
+  .write(Paths.get("src/dev/http-mock/generated.har"), feature.getHar());
+----
+
+TIP: this code can easily be integrated in mainstream frameworks like Arquillian, JUnit 5 etc..., don't hesitate to encapsulate it.
+
+== Node JS integration
+
+Then you can use any server supporting HAR to serve the saved frames.
+For instance for a Node one you can use `har-express`:
+
+[source,bash]
+----
+npm -i -g har-express
+----
+
+[source,javascript]
+----
+har-express -p 8000 ./src/dev/http-mock/generated.har
+----
+
+Or even integrate it into link:https://www.npmjs.com/package/har-express[webpack] directly.
